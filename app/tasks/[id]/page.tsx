@@ -1,36 +1,21 @@
-"use client";
+import TaskDetailClient from '../task-detail-client';
 
-import { useTasks } from "@/hooks/useTasks";
-import { TaskDetails } from "@/components/tasks/tasks-detail";
-import { notFound } from "next/navigation";
-import { TaskDetailSkeleton } from "./task-detail-skeleton";
-import { useAuthStore, useHydrateAuthFromStorage } from "@/hooks/useAuthStore";
-import { redirect } from "next/navigation";
+// interface TaskPageProps {
+//   params: {
+//     id: string;
+//   };
+// }
 
-export default function DetailTaskPage({ params }: { params: { id: string } }) {
-  const { tasks, error, loading } = useTasks();
-
-  useHydrateAuthFromStorage({
-    onHydrated: () => {
-      if (!useAuthStore.getState().token) {
-        redirect("/login");
-      }
-    }
-  })
-
-  if (loading) {
-    return <TaskDetailSkeleton />;
+export default async function TaskDetailPage({ 
+  params 
+}:{
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  
+  if (!id) {
+    throw new Error('Task ID is required');
   }
 
-  if (error) {
-    throw error; 
-  }
-  
-  const task = tasks.find((t) => t.id === params.id);
-  
-  if (!task) {
-    notFound(); 
-  }
-  
-  return <TaskDetails task={task} />;
+  return <TaskDetailClient taskId={id} />;
 }

@@ -3,17 +3,17 @@ import { getSocket, disconnectSocket } from '@/lib/socket';
 import { useAuthStore } from '@/hooks/useAuthStore';
 
 export const useSocket = () => {
-  const { token } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
   const connect = () => {
-    if (token) {
-      const socket = getSocket();
-      // Auto-reconnect logic sudah di socket.io
+    if (isAuthenticated) {
+      getSocket();
+      console.log('WS Connected');
     }
   };
 
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       connect();
     } else {
       disconnectSocket();
@@ -21,8 +21,9 @@ export const useSocket = () => {
 
     return () => {
       disconnectSocket();
+      console.log('WS Disconnected'); 
     };
-  }, [token]);
+  }, [isAuthenticated]);
 
   return { connect };
 };
